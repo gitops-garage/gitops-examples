@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "springboot-basic.fullname" . }}
+  labels:
+    {{- include "springboot-basic.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "springboot-basic.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        {{- include "springboot-basic.selectorLabels" . | nindent 8 }}
+      
+      {{- with .Values.podAnnotations }}
+      annotations:
+      {{- toYaml . | nindent 8 }}
+      
+      {{- end }}
+
+    spec:
+      serviceAccountName: {{ include "springboot-basic.serviceAccountName" . }}
+      containers:
+        - name: {{ include "springboot-basic.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          
+          {{- if or .Values.config .Values.secret }}
+          envFrom:
+
+          {{- if .Values.config }}
+          - configMapRef:
+              name: {{ include "springboot-basic.fullname" . }}-config
+          {{- end }}
+
+          {{- if .Values.secret }}
+          - secretRef:
+              name: {{ include "springboot-basic.fullname" . }}-secret
+          {{- end }}
+
+          {{- end }}
+
+          {{- with .Values.env }}
+          
+          env:
+          {{- toYaml .Values.env | nindent 12 }}
+          
+          {{ end }}
+
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
