@@ -1,0 +1,28 @@
+GitOps Garage
+
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Application:
+  {{ include "springboot-basic.fullname" . }}
+
+Image:
+  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+
+Service:
+  {{ include "springboot-basic.fullname" . }}
+
+Port:
+  {{ .Values.service.port }}
+
+To access the application locally:
+
+{{- if .Values.ingress.enabled }}
+
+URL: {{ .Values.ingress.host }}
+
+{{- else }}
+
+{{ include "springboot-basic.fullname" . }}
+
+{{ end }}
