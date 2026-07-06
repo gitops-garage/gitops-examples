@@ -27,10 +27,18 @@ secret: {}
 env: []
 
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+
+  className: "nginx"
+
   annotations: {}
-  hosts: []
+
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+
   tls: []
 
 podAnnotations: {}
