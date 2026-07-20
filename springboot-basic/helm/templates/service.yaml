@@ -1,18 +1,15 @@
-{{- if .Values.secret }}
-
 apiVersion: v1
-kind: Secret
-
+kind: Service
 metadata:
-  name: {{ include "springboot-basic.fullname" . }}-secret
   labels:
     {{- include "springboot-basic.labels" . | nindent 4 }}
-
-type: Opaque
-
-stringData:
-{{- range $key, $value := .Values.secret }}
-  {{ $key }}: {{ $value | quote }}
-{{- end }}
-
-{{- end }}
+  name: {{ include "springboot-basic.fullname" . }}
+spec:
+  type: ClusterIP
+  selector:
+    {{ include "springboot-basic.selectorLabels" . | nindent 4 }}
+  ports:
+  - name: http
+    port: {{ .Values.service.port }}
+    targetPort: http
+    protocol: TCP
