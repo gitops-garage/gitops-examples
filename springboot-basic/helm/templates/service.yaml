@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     {{- include "springboot-basic.labels" . | nindent 4 }}
+  name: {{ include "springboot-basic.fullname" . }}
 spec:
   type: ClusterIP
   selector:
